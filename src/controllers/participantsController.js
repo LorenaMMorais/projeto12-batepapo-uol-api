@@ -10,7 +10,7 @@ export async function setParticipants(req, res){
         lastStatus: Date.now()
     };
 
-    const participantsSchema = joi.object({
+    const schema = joi.object({
         name: joi.string().required()
     });
     const validation = schema.validate(body);
@@ -22,8 +22,8 @@ export async function setParticipants(req, res){
     try{
         const checkName = await db.collection('participants').findOne({name: body.name});
         if(checkName){
-            res.status(409).send('Usuário já tem cadastro');
-            console.log('Usuário já tem cadastro');
+            res.status(409).send('Nome de usuário já existente');
+            console.log('Nome de usuário já existente');
             return;
         }
         
@@ -50,6 +50,6 @@ export async function getParticipants(req, res){
         res.send(response);
     }catch{
         console.log('erro')
-        res.status(500).send('Usuário não encontrado');
+        res.status(500).send('Erro');
     }
 }
