@@ -1,12 +1,55 @@
 import db from '../db.js';
-
-let users = [];
+import joi from 'joi';
+import dayjs from 'dayjs';
 
 export async function setParticipants(req, res){
-    const participants = {
-        name: req.body.name,
-        lastStatus: req.body.lastStatus
+    const body = req.body;
+
+    const participant = {
+        name: body.name,
+        lastStatus: Date.now()
+    };
+
+    const participantsSchema = joi.object({
+        name: joi.string().required()
+    });
+    const validation = schema.validate(body);
+    if(validation.error){
+        console.log('Erro na validação do usuário', validation.error);
+        res.status(422).send(validation.error.details[0].message);
+        return;
     }
-    users.push(participants);
-    res.sendStatus(201);
+    try{
+        const checkName = await db.collection('participants').findOne({name: body.name});
+        if(checkName){
+            res.status(409).send('Usuário já tem cadastro');
+            console.log('Usuário já tem cadastro');
+            return;
+        }
+        
+        const loginMessage = {
+            from: body.name,
+            to: 'Todos',
+            text: 'entra na sala...',
+            type: 'status',
+            time: dayjs().format('HH:MM:SS')
+        }
+        await db.collection('participants').insertOne(participant);
+        await db.collection('messages').insertOne(loginMessage);
+        console.log(loginMessage);
+        res.status(201);      
+    }catch{
+        res.status(422).send("Erro ao cadastrar usuário");
+    }
+}
+
+export async function getParticipants(req, res){
+    try{
+        const response =  await db.collection('participants').find({}).toArray();
+        console.log(response);
+        res.send(response);
+    }catch{
+        console.log('erro')
+        res.status(500).send('Usuário não encontrado');
+    }
 }
