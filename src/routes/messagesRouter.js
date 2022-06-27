@@ -6,4 +6,4 @@ const messagesRouter = express.Router();
 messagesRouter.post('/messages', setMessages);
 messagesRouter.get('/messages', getMessages);
 
-export default participantsRouter;
+export default messagesRouter;
