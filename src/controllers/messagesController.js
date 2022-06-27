@@ -51,7 +51,7 @@ export async function getMessages(req, res){
     try{
         const showMessages = await db.collection('messages').find({$or:[{to: 'Todos'}, {from: user}, {to: user}]}).toArray();
         console.log(showMessages);
-        limit ? res.send(showMessages.slice(0, limit)) : res.send(showMessages);
+        limit ? res.send(showMessages.slice(- limit)) : res.send(showMessages);
     }catch(er){
         console.log('Erro ao buscar mensagem');
         res.send('Erro ao buscar mensagem' + er);
